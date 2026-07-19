@@ -1,4 +1,4 @@
-import type { JourneyResult } from '../types'
+import type { JourneyResult, Listing } from '../types'
 import type { BackendReadingResponse } from './types'
 
 /**
@@ -7,15 +7,14 @@ import type { BackendReadingResponse } from './types'
  * is the only file (together with types.ts) that should need an edit —
  * every UI component only ever sees a JourneyResult.
  *
- * The current backend stub doesn't return a destination breakdown, map
- * coordinates, an archetype description, or listing names. The fields
- * below are marked as placeholders until the backend provides them.
+ * The backend doesn't return a destination breakdown or map coordinates
+ * yet — those fields are marked as placeholders until it does.
  */
 export function adaptReadingResponse(
   raw: BackendReadingResponse,
 ): JourneyResult {
   return {
-    reflection: raw.reflection,
+    reflection: raw.message,
     destination: {
       name: raw.city,
       country: '', // placeholder — backend doesn't return this yet
@@ -24,20 +23,69 @@ export function adaptReadingResponse(
     },
     archetype: {
       name: raw.archetype,
-      description: '', // placeholder — backend doesn't return this yet
+      description: raw.description,
     },
-    listings: raw.listings.map((listing, index) => ({
-      id: `${raw.city}-listing-${index}`,
-      name: listing.source, // placeholder — backend doesn't return a listing name yet
-      image: listing.image,
-      price: listing.price,
-      source: listing.source,
-      url: listing.url,
-    })),
+    listings: [
+      toListing(
+        'hotel-1',
+        raw.hotel1Name,
+        raw.hotel1Image,
+        raw.hotel1Price,
+        raw.hotel1Source,
+        raw.hotel1Rating,
+        raw.hotel1Url,
+      ),
+      toListing(
+        'hotel-2',
+        raw.hotel2Name,
+        raw.hotel2Image,
+        raw.hotel2Price,
+        raw.hotel2Source,
+        raw.hotel2Rating,
+        raw.hotel2Url,
+      ),
+      toListing(
+        'hotel-3',
+        raw.hotel3Name,
+        raw.hotel3Image,
+        raw.hotel3Price,
+        raw.hotel3Source,
+        raw.hotel3Rating,
+        raw.hotel3Url,
+      ),
+    ],
     map: {
       latitude: 0, // placeholder — backend doesn't return coordinates yet
       longitude: 0, // placeholder — backend doesn't return coordinates yet
       placeName: raw.city,
     },
   }
+}
+
+function toListing(
+  id: string,
+  name: string,
+  image: string,
+  price: string,
+  source: string,
+  rating: unknown,
+  url: string,
+): Listing {
+  return { id, name, image, price, source, url, rating: parseRating(rating) }
+}
+
+/** Accepts a finite number or a numeric string; anything else (missing, null, NaN, garbage) becomes "no rating" instead of crashing. */
+function parseRating(value: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value)
+    if (Number.isFinite(parsed)) {
+      return parsed
+    }
+  }
+
+  return undefined
 }

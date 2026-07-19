@@ -1,30 +1,45 @@
+# test_parse.py
 import asyncio
-from models import stay22Listing
-from main import parse_listings  # or wherever it lives
+from main import parse_listings
 
-mock_response = {
+# fake response shaped like a real Stay22 API result
+fake_raw_response = {
     "results": [
         {
-            "name": "Iruma INN",
-            "thumbnail": {"thumbnail": "https://example.com/thumb1.jpg"},
-            "rating": {"value": 8.3},
-            "url": "https://www.stay22.com/allez/roam/usds_aa5c176f4c76d90648d6a8940c5a1c41.0000",
+            "name": "Hoshinoya Kyoto",
+            "media": {"thumbnail": "https://example.com/img1.jpg"},
+            "suppliers": {
+                "booking": {"price": {"total": 420}, "link": "https://booking.com/hoshinoya"}
+            },
+            "rating": {"hotelStars": 5},
+            "url": "https://stay22.com/listing/1",
         },
         {
-            "name": "Cruise garden",
-            "thumbnail": {"thumbnail": "https://example.com/thumb2.jpg"},
-            "rating": {"value": 8.3},
-            "url": "https://www.stay22.com/allez/roam/usds_f27def1fc53c555b9552f203b8862b25.0000",
+            "name": "Sowaka",
+            "media": {"thumbnail": "https://example.com/img2.jpg"},
+            "suppliers": {
+                "vrbo": {"price": {"total": 280}, "link": "https://vrbo.com/sowaka"}
+            },
+            "rating": {"hotelStars": 4},
+            "url": "https://stay22.com/listing/2",
+        },
+        {
+            "name": "No Supplier Hotel",
+            "media": {},
+            "suppliers": {},  # edge case: no supplier data at all
+            "rating": {},
+            "url": "https://stay22.com/listing/3",
         },
     ]
 }
 
-async def test():
-    listings = await parse_listings(mock_response)
-    for hotel in listings:
-        print(hotel)
-        print(mock_response["results"][0]["thumbnail"]["thumbnail"])
-        assert hotel.name is not None
-        assert hotel.thumbnail is not None
 
-asyncio.run(test())
+async def main():
+    listings = await parse_listings(fake_raw_response)
+    for i, listing in enumerate(listings, start=1):
+        print(f"--- Listing {i} ---")
+        print(listing.model_dump_json(indent=2))
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
