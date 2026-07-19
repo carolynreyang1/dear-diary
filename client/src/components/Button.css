@@ -7,8 +7,12 @@
   text-transform: uppercase;
   padding: 1.125rem 2.75rem;
   border: 1px solid var(--ink);
+  border-radius: 14px;
+  transition: all .25s ease;
   background: var(--ink);
   color: var(--paper-elevated);
+  background: #3f4c3f;
+  color: #fffdf8;
   cursor: pointer;
   box-shadow: var(--shadow-soft);
   transition:
@@ -23,6 +27,7 @@
   color: var(--ink);
   box-shadow: var(--shadow-medium);
   transform: translateY(-2px);
+  
 }
 
 .btn:active:not(:disabled) {

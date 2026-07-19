@@ -1,4 +1,7 @@
 import type { JourneyResult } from '../types'
+import hoshinoyaImage from '../assets/stays/hoshinoya-ryokan.jpg'
+import sowakaImage from '../assets/stays/sowaka-machiya.jpg'
+import aoyamaImage from '../assets/stays/aoyama-garden.jpg'
 
 export const APP_COPY = {
   journal: {
@@ -31,11 +34,18 @@ export const APP_COPY = {
   },
   results: {
     writeAgainLabel: 'Write again',
-    reflectionLabel: 'Reflection',
-    destinationLabel: 'Your destination',
+    reflectionLabel: 'What we heard between the lines',
+    destinationLabel: 'Your words point toward…',
     archetypeLabel: 'Traveler archetype',
-    staysLabel: 'Places to stay',
+    staysLabel: 'Somewhere to land',
     mapLabel: 'On the map',
+    viewStayLabel: 'View stay',
+  },
+  error: {
+    kicker: 'A page went missing',
+    fallbackMessage:
+      'Something went wrong while reading your journal. Please try again.',
+    retryLabel: 'Write again',
   },
 } as const
 
@@ -44,7 +54,7 @@ export const LOADING_MESSAGE_INTERVAL_MS = 2200
 
 export const MOCK_JOURNEY_RESULT: JourneyResult = {
   reflection:
-    'Your words carry the quiet ache of transition — not grief exactly, but the tender space between who you were and who you are becoming. You need somewhere that honors slowness: mornings without agenda, rooms that feel like borrowed time, and landscapes patient enough to hold a question without demanding an answer.',
+    'Your words carry the quiet ache of transition — not grief exactly, but the tender space between who you were and who you are becoming. Your words seem to be searching for somewhere that honors slowness: mornings without agenda, rooms that feel like borrowed time, and landscapes patient enough to hold a question without demanding an answer.',
   destination: {
     name: 'Kyoto',
     country: 'Japan',
@@ -56,30 +66,30 @@ export const MOCK_JOURNEY_RESULT: JourneyResult = {
     description:
       'You travel not to escape, but to arrive — softly, deliberately, with room to breathe between moments. You seek places where beauty is understated and silence is considered a kind of hospitality.',
   },
-  accommodations: [
+  listings: [
     {
       id: 'hoshinoya',
       name: 'Hoshinoya Kyoto',
-      description:
-        'A riverside retreat tucked into the hills of Arashiyama. Paper screens, tatami floors, and the sound of water outside your window.',
+      image: hoshinoyaImage,
       price: 'From $420 / night',
-      mood: 'Contemplative luxury',
+      source: 'Demo · Booking.com',
+      url: 'https://example.com/stays/hoshinoya-kyoto',
     },
     {
       id: 'sowaka',
       name: 'Sowaka',
-      description:
-        'A restored machiya townhouse in Gion. Wooden beams, a private courtyard garden, and the hush of old Kyoto just beyond the gate.',
+      image: sowakaImage,
       price: 'From $280 / night',
-      mood: 'Heritage intimacy',
+      source: 'Demo · Airbnb',
+      url: 'https://example.com/stays/sowaka',
     },
     {
       id: 'aoyama',
       name: 'Aoyama Tea House',
-      description:
-        'A small guesthouse near the Philosopher\'s Path. Shared morning tea, handwritten notes from the host, and bicycles for unhurried afternoons.',
+      image: aoyamaImage,
       price: 'From $145 / night',
-      mood: 'Quiet companionship',
+      source: 'Demo · Hotels.com',
+      url: 'https://example.com/stays/aoyama-tea-house',
     },
   ],
   map: {

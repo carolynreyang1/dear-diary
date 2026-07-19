@@ -1,4 +1,4 @@
-export type AppState = 'journal' | 'reading' | 'results'
+export type AppState = 'journal' | 'reading' | 'results' | 'error'
 
 export type JournalInputType = 'text' | 'image'
 
@@ -23,6 +23,15 @@ export interface Accommodation {
   mood: string
 }
 
+export interface Listing {
+  id: string
+  name: string
+  image: string
+  price: string
+  source: string
+  url: string
+}
+
 export interface JourneyResult {
   reflection: string
   destination: {
@@ -35,7 +44,7 @@ export interface JourneyResult {
     name: string
     description: string
   }
-  accommodations: Accommodation[]
+  listings: Listing[]
   map: {
     latitude: number
     longitude: number

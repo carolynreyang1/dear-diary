@@ -26,50 +26,48 @@ export function ResultsScreen({ result, onWriteAgain }: ResultsScreenProps) {
       className={`results ${revealed ? 'results--revealed' : ''}`}
       aria-label="Journey results"
     >
+      <article className="results__block results__block--reflection">
+        <Label>{copy.reflectionLabel}</Label>
+        <p className="results__reflection">{result.reflection}</p>
+      </article>
+
+      <div className="results__divider results__divider--1" aria-hidden="true" />
+
       <header className="results__hero">
         <Label>{copy.destinationLabel}</Label>
         <h1 className="results__destination">
           <span className="results__destination-text">
             {result.destination.name}
           </span>
-          <span className="results__country">{result.destination.region}</span>
+          <span className="results__country">{result.destination.country}</span>
         </h1>
         <p className="results__tagline">{result.destination.tagline}</p>
       </header>
 
-      <div className="results__divider" aria-hidden="true" />
+      <article className="results__block results__block--archetype">
+        <Label>{copy.archetypeLabel}</Label>
+        <h2 className="results__archetype-name">{result.archetype.name}</h2>
+        <p className="results__archetype-desc">
+          {result.archetype.description}
+        </p>
+      </article>
 
-      <div className="results__grid">
-        <article className="results__block results__block--reflection">
-          <Label>{copy.reflectionLabel}</Label>
-          <p className="results__reflection">{result.reflection}</p>
-        </article>
-
-        <article className="results__block results__block--archetype">
-          <Label>{copy.archetypeLabel}</Label>
-          <h2 className="results__archetype-name">{result.archetype.name}</h2>
-          <p className="results__archetype-desc">
-            {result.archetype.description}
-          </p>
-        </article>
-      </div>
-
-      <div className="results__divider" aria-hidden="true" />
+      <div className="results__divider results__divider--2" aria-hidden="true" />
 
       <section className="results__stays">
         <Label>{copy.staysLabel}</Label>
         <div className="results__cards">
-          {result.accommodations.map((accommodation, index) => (
+          {result.listings.map((listing, index) => (
             <AccommodationCard
-              key={accommodation.id}
-              accommodation={accommodation}
+              key={listing.id}
+              listing={listing}
               index={index}
             />
           ))}
         </div>
       </section>
 
-      <div className="results__divider" aria-hidden="true" />
+      <div className="results__divider results__divider--3" aria-hidden="true" />
 
       <section className="results__map-section">
         <Label>{copy.mapLabel}</Label>
