@@ -1,0 +1,198 @@
+.journal-entry {
+  width: 100%;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-md) var(--space-2xl);
+  animation: fade-up 0.9s var(--ease-out) both;
+}
+
+.journal-entry__header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.journal-entry__kicker {
+  font-family: var(--font-hand);
+  font-size: 1.5rem;
+  color: var(--ink-muted);
+  margin: 0 0 var(--space-sm);
+  animation: fade-up 0.9s var(--ease-out) 0.1s both;
+}
+
+.journal-entry__title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.25rem, 5.5vw, 3.25rem);
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin: 0 0 var(--space-md);
+  animation: fade-up 0.9s var(--ease-out) 0.2s both;
+}
+
+.journal-entry__subtitle {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.75;
+  color: var(--ink-muted);
+  max-width: 28rem;
+  margin: 0 auto;
+  animation: fade-up 0.9s var(--ease-out) 0.3s both;
+}
+
+.journal-entry__form {
+  animation: fade-up 0.9s var(--ease-out) 0.45s both;
+}
+
+.journal-entry__notebook {
+  position: relative;
+  background: var(--paper-notebook);
+  border: 1px solid var(--border);
+  border-radius: 1px;
+  box-shadow: var(--shadow-notebook);
+  padding: 0;
+  overflow: hidden;
+}
+
+.journal-entry__notebook::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--texture-noise);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.7;
+}
+
+.journal-entry__notebook::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 3.5rem;
+  background: linear-gradient(
+    90deg,
+    rgba(31, 27, 23, 0.04) 0%,
+    rgba(31, 27, 23, 0.01) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.journal-entry__binding {
+  position: absolute;
+  top: 0;
+  left: 2.65rem;
+  bottom: 0;
+  width: 1px;
+  background: var(--margin-line);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.journal-entry__holes {
+  position: absolute;
+  top: 0;
+  left: 1.15rem;
+  bottom: 0;
+  width: 0.75rem;
+  pointer-events: none;
+  z-index: 3;
+  background-image: radial-gradient(
+    circle at center,
+    var(--paper-warm) 3px,
+    var(--border) 3.5px,
+    var(--border) 4.5px,
+    transparent 5px
+  );
+  background-size: 100% 2.75rem;
+  background-position: center 1.375rem;
+  background-repeat: repeat-y;
+}
+
+.journal-entry__textarea {
+  display: block;
+  width: 100%;
+  min-height: 20rem;
+  padding: 2rem 2rem 2rem 4rem;
+  border: none;
+  background: transparent;
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  line-height: 2.125rem;
+  color: var(--ink);
+  resize: vertical;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 0;
+  background-image:
+    var(--texture-fiber),
+    repeating-linear-gradient(
+      transparent,
+      transparent calc(2.125rem - 1px),
+      var(--ruled-line) calc(2.125rem - 1px),
+      var(--ruled-line) 2.125rem
+    );
+  background-attachment: local;
+  transition: color 0.3s ease;
+}
+
+.journal-entry__textarea::placeholder {
+  color: var(--ink-faint);
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.journal-entry__textarea:focus {
+  outline: none;
+}
+
+.journal-entry__actions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-xl);
+}
+
+.journal-entry__divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin: var(--space-xl) 0;
+}
+
+.journal-entry__divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-light);
+}
+
+.journal-entry__divider-label {
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .journal-entry {
+    padding: var(--space-lg) var(--space-sm) var(--space-xl);
+  }
+
+  .journal-entry__binding {
+    left: 2rem;
+  }
+
+  .journal-entry__holes {
+    left: 0.85rem;
+  }
+
+  .journal-entry__textarea {
+    padding: 1.5rem 1.25rem 1.5rem 3.25rem;
+    font-size: 1.1rem;
+    line-height: 2rem;
+    min-height: 16rem;
+  }
+}
