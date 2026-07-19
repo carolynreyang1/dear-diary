@@ -33,6 +33,12 @@ export interface Listing {
   rating?: number
 }
 
+export interface MapHotel {
+  name: string
+  lat: number
+  lng: number
+}
+
 export interface JourneyResult {
   reflection: string
   destination: {
@@ -46,9 +52,5 @@ export interface JourneyResult {
     description: string
   }
   listings: Listing[]
-  map: {
-    latitude: number
-    longitude: number
-    placeName: string
-  }
+  mapHotels: MapHotel[]
 }

@@ -71,11 +71,7 @@ export function ResultsScreen({ result, onWriteAgain }: ResultsScreenProps) {
 
       <section className="results__map-section">
         <Label>{copy.mapLabel}</Label>
-        <MapPlaceholder
-          placeName={result.map.placeName}
-          latitude={result.map.latitude}
-          longitude={result.map.longitude}
-        />
+        <MapPlaceholder mapHotels={result.mapHotels} />
       </section>
 
       <footer className="results__footer">
