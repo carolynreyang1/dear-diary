@@ -1,11 +1,13 @@
+import os
+import json
+import asyncio
+
 from google import genai
 from fastapi import FastAPI, Form, APIRouter
-import os
 from dotenv import load_dotenv
 from archetypes import ARCHETYPES
-import json
 from models import Interpretation
-import asyncio
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -14,32 +16,32 @@ api_key = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 
 prompt = """
-You are analyzing the emotional weather of a piece of personal writing — not just the mood, but the pacing, tension, and what the writing is reaching for.
+Read the user's journal. {text}
 
-Here are the archetypes you can match against:
+First, write a short reflection (understandingMessage) that mirrors the emotional themes without diagnosing the user.
 
-{archetype_list}
+The reflection should:
 
-Here is the personal writing to analyze:
+    feel empathetic
+    avoid "you are..."
+    avoid mental health diagnoses
+    avoid clichés
+    be 2 to 4 sentences
+    sound thoughtful and poetic
+    explain what the writing seems to be searching for
 
-{text}
+
+Then recommend the best destination.
 
 
-Return the archetype that best matches the writing, and a citie that is most relevant to the writing, and an eloquent understanding message based on the input text and archetype in the following JSON format:
+Return the archetype that best matches the writing, and a city that is most relevant to the writing, and an eloquent understanding message based on the input text and archetype in the following JSON format:
 {{
     "archetype": "string",
+    "archetypeDescriptor": "string",
     "city": "string",
     "understandingMessage": "string"
 }}
 """
-
-# def get_interpretation(text: str, archetype_list: list[str]):
-#     response = client.interactions.create(
-#         model="gemini-3.5-flash",
-#         input=prompt.format(text=text, archetype_list=archetype_list)
-#     )
-#     print(response.output_text)
-#     return response.output_text
 
 
 async def get_interpretation(text: str, archetype_list: list[str]) -> Interpretation:

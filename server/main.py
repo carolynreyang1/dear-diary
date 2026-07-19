@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from models import inputUserData, outputUserData, stay22Listing
+from models import inputUserData, stay22Listing
 from stay22 import get_listings
+from llm import get_interpretation
 from archetypes import ARCHETYPES
 
 load_dotenv()
@@ -17,51 +18,55 @@ app.add_middleware(
 )
 
 async def parse_listings(raw_response: dict) -> list[stay22Listing]:
-    return [
-        stay22Listing(
+    listings = []
+    for item in raw_response["results"]:
+        suppliers = item.get("suppliers", {})
+        supplier_name, supplier_data = next(iter(suppliers.items()), (None, {}))
+        price = supplier_data.get("price", {}).get("total")
+
+        listings.append(stay22Listing(
             name=item.get("name"),
-            thumbnail=item.get("thumbnail", {}).get("thumbnail"),
-            rating=item.get("rating", {}).get("value"),
+            thumbnail=item.get("media", {}).get("thumbnail"),
+            price=price,
+            source=supplier_name,
+            rating=item.get("rating", {}).get("hotelStars"),
             url=item.get("url"),
-        )
-        for item in raw_response["results"]
-    ]
+        ))
+    return listings
 
 
-@app.post("/diarytext/")
+@app.post("/api/reading")
 async def get_diarytext(req: inputUserData):
-    #Gemni response
-    interpretation = await get_interpretation(userInput.text, ARCHETYPES)
+    interpretation = await get_interpretation(req.text, ARCHETYPES)
 
-    #Stay22 for each city
-    hotels = await get_listings(city)
-
+    hotels = await get_listings(interpretation.city)
     listings = await parse_listings(hotels)
 
-    first_hotel = listings[0]
-    second_hotel = listings[1]
-    third_hotel = listings[2]
+    # pad with None if fewer than 3 listings come back, so we don't crash
+    while len(listings) < 3:
+        listings.append(None)
 
+    first_hotel, second_hotel, third_hotel = listings[0], listings[1], listings[2]
 
-    #return callback
+    def hotel_fields(hotel, n):
+        if hotel is None:
+            return {f"hotel{n}Name": None, f"hotel{n}Image": None, f"hotel{n}Price": None,
+                     f"hotel{n}Source": None, f"hotel{n}Rating": None, f"hotel{n}Url": None}
+        return {
+            f"hotel{n}Name": hotel.name,
+            f"hotel{n}Image": hotel.thumbnail,
+            f"hotel{n}Price": hotel.price,
+            f"hotel{n}Source": hotel.source,
+            f"hotel{n}Rating": hotel.rating,
+            f"hotel{n}Url": hotel.url,
+        }
+
     return {
-        "archetype": interpretation["archetype"],
-        "city": interpretation["city"],
-
-        "hotel1Name": first_hotel.name,
-        "hotel1Image": first_hotel.thumbnail,
-        "hotel1Rating": first_hotel.rating,
-        "hotel1Url": first_hotel.url,
-
-        "hotel2Name": second_hotel.name,
-        "hotel2Image": second_hotel.thumbnail,
-        "hotel2Rating": second_hotel.rating,
-        "hotel2Url": second_hotel.url,
-
-        "hotel3Name": third_hotel.name,
-        "hotel3Image": third_hotel.thumbnail,
-        "hotel3Rating": third_hotel.rating,
-        "hotel3Url": third_hotel.url,
-
-        "message": interpretation["understandingMessage"]
+        "description": interpretation.understandingMessage,
+        "archetype": interpretation.archetype,
+        "city": interpretation.city,
+        **hotel_fields(first_hotel, 1),
+        **hotel_fields(second_hotel, 2),
+        **hotel_fields(third_hotel, 3),
+        "message": interpretation.understandingMessage,
     }
