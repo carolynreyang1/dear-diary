@@ -6,6 +6,7 @@ import { ResultsScreen } from './components/ResultsScreen'
 import { ErrorScreen } from './components/ErrorScreen'
 import { submitJournalInput } from './services/journalService'
 import type { AppState, JournalInput, JourneyResult } from './types'
+import logo from './assets/logo.png'
 import './App.css'
 
 function App() {
@@ -74,7 +75,11 @@ function App() {
       </main>
 
       <footer className="app__footer">
-        <p>Dear Diary, Take Me Here</p>
+        <img
+          className="app__logo"
+          src={logo}
+          alt="Dear Diary, Take Me Here"
+        />
       </footer>
     </div>
   )

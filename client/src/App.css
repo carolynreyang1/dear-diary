@@ -31,11 +31,14 @@
   background: rgba(250, 246, 239, 0.5);
 }
 
-.app__footer p {
-  font-family: var(--font-sans);
-  font-size: 0.6rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  margin: 0;
+.app__logo {
+  height: 44px;
+  width: auto;
+  display: inline-block;
+}
+
+@media (max-width: 640px) {
+  .app__logo {
+    height: 36px;
+  }
 }
