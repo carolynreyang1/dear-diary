@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from models import inputUserData, stay22Listing
 from stay22 import get_listings
 from llm import get_interpretation
+from imageParse import extract_text_from_image
 from archetypes import ARCHETYPES
 
 load_dotenv()
@@ -36,9 +37,27 @@ async def parse_listings(raw_response: dict) -> list[stay22Listing]:
 
 
 @app.post("/api/reading")
-async def get_diarytext(req: inputUserData):
-    interpretation = await get_interpretation(req.text, ARCHETYPES)
+async def get_diarytext(request: Request):
 
+    content_type = request.headers.get("content-type", "")
+    
+    if "application/json" in content_type:
+        # existing text path
+        body = await request.json()
+        req = inputUserData(**body)
+        text = req.text
+
+    elif "multipart/form-data" in content_type:
+        # new image path
+        form = await request.form()
+        image_file: UploadFile = form["image"]
+        image_bytes = await image_file.read()
+        text = await extract_text_from_image(image_bytes, mime_type=image_file.content_type)
+
+    else:
+        raise HTTPException(status_code=415, detail="Unsupported content type.")
+
+    interpretation = await get_interpretation(text, ARCHETYPES)
     hotels = await get_listings(interpretation.city)
     listings = await parse_listings(hotels)
 

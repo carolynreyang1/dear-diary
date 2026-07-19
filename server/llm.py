@@ -45,12 +45,13 @@ Return the archetype that best matches the writing, and a city that is most rele
 
 
 async def get_interpretation(text: str, archetype_list: list[str]) -> Interpretation:
-    response = client.interactions.create(
+    response = client.models.generate_content(
         model="gemini-3.5-flash",
-        input=prompt.format(text=text, archetype_list=archetype_list)
+        contents=prompt.format(text=text, archetype_list=archetype_list),
+        config={"response_mime_type": "application/json"},
     )
 
-    raw_text = response.output_text
+    raw_text = response.text
 
     try:
         parsed = json.loads(raw_text)
@@ -58,6 +59,7 @@ async def get_interpretation(text: str, archetype_list: list[str]) -> Interpreta
     except (json.JSONDecodeError, KeyError, TypeError) as e:
         raise ValueError(f"Failed to parse LLM response: {raw_text}") from e
 
-if __name__ == '__main__': 
+
+if __name__ == '__main__':
     result = asyncio.run(get_interpretation("I'm very sadddd", ARCHETYPES))
     print(result.model_dump_json(indent=2))
