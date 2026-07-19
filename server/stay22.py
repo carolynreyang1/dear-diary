@@ -31,10 +31,3 @@ async def get_listings(address: string):
 if __name__ == '__main__': 
     result = asyncio.run(get_listings("Tokyo, Japan"))
     print(json.dumps(result, indent=2))
-
-#thumbnail
-#multiple hotels in 3 diff locations
-#name
-#ratings
-# consolation message - I understand how you are feeling because of ____, you should ____ and go to these places
-# naming your mood

@@ -11,16 +11,25 @@ class inputUserData(BaseModel):
 
 #output model
 class stay22Listing(BaseModel):
-    name: str
+    name: str | None = None
     thumbnail: str | None = None
-    rating: float | None = None
-    url: str
+    price: float | None = None
+    source: str | None = None
+    rating: int | None = None
+    url: str | None = None
+    lat: float | None
+    lng: float | None
+
+#Stay22 API response model
+class stay22Response(BaseModel):
+    listings: list[stay22Listing]
 
 class outputUserData(BaseModel):
-    archetype: str
-    city: str
     reflection: str
+    city: str
+    archetype: str
     listings: list[stay22Listing]
+
 
 
 #LLM API request model
@@ -29,11 +38,7 @@ class llmInputData(BaseModel):
 
 class Interpretation(BaseModel):
     archetype: str
+    archetypeDescriptor: str
     city: str
     understandingMessage: str
-
-
-#Stay22 API response model
-class stay22Response(BaseModel):
-    listings: list[stay22Listing]
 
