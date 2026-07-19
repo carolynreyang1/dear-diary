@@ -95,9 +95,9 @@ export const MOCK_JOURNEY_RESULT: JourneyResult = {
       rating: 4.7,
     },
   ],
-  map: {
-    latitude: 35.0116,
-    longitude: 135.7681,
-    placeName: 'Kyoto, Japan',
-  },
+  mapHotels: [
+    { name: 'Hoshinoya Kyoto', lat: 35.0116, lng: 135.6781 },
+    { name: 'Sowaka', lat: 35.0037, lng: 135.7772 },
+    { name: 'Aoyama Tea House', lat: 35.0034, lng: 135.7788 },
+  ],
 }

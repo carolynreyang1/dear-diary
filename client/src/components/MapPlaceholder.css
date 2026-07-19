@@ -2,79 +2,40 @@
   width: 100%;
 }
 
-.map-placeholder__frame {
-  aspect-ratio: 16 / 9;
+.map-placeholder__map {
+  width: 100%;
+  height: 320px;
   border: 1px solid var(--border);
-  background: var(--paper-notebook);
-  position: relative;
+  border-radius: 10px;
   overflow: hidden;
   box-shadow: var(--shadow-soft);
 }
 
-.map-placeholder__frame::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--texture-noise);
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.5;
+.map-placeholder__fallback {
+  width: 100%;
+  height: 320px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  background: var(--paper-notebook);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-sm);
 }
 
-.map-placeholder__grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--border-light) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
-  background-size: 3rem 3rem;
-  opacity: 0.7;
-}
-
-.map-placeholder__pin {
-  position: absolute;
-  top: 42%;
-  left: 58%;
-  width: 8px;
-  height: 8px;
-  background: var(--ink);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  box-shadow: 0 1px 3px rgba(31, 27, 23, 0.2);
-}
-
-.map-placeholder__pin::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--ink);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  opacity: 0.15;
-  animation: pulse-ring 3s var(--ease-in-out) infinite;
-}
-
-.map-placeholder__coords {
-  position: absolute;
-  bottom: 1rem;
-  right: 1.25rem;
-  font-family: var(--font-sans);
-  font-size: 0.58rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  margin: 0;
-  z-index: 2;
-}
-
-.map-placeholder__place {
+.map-placeholder__fallback-text {
   font-family: var(--font-hand);
   font-size: 1.2rem;
   color: var(--ink-muted);
-  text-align: center;
-  margin: var(--space-sm) 0 0;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .map-placeholder__map,
+  .map-placeholder__fallback {
+    height: 240px;
+  }
 }

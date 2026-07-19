@@ -1,0 +1,249 @@
+================================================================
+ DEAR DIARY, TAKE ME HERE — FRONTEND / BACKEND INTEGRATION GUIDE
+================================================================
+Audience: backend teammate (FastAPI)
+Author:   frontend owner (React + TypeScript + Vite)
+Status:   frontend complete, running on mock data, ready to integrate
+
+
+----------------------------------------------------------------
+1. FRONTEND ARCHITECTURE (BRIEF)
+----------------------------------------------------------------
+
+The app is a single-page state machine with four screens, driven from
+one component (App.tsx):
+
+    journal --submit--> reading --response arrives--> results
+                              \
+                               `--on error--> error
+
+- journal: user types text or uploads an image (PNG/JPG/JPEG/HEIC/HEIF)
+- reading: loading animation; the backend request fires the moment the
+  user submits, running in parallel with the animation
+- results: renders the trip (destination, reflection, archetype, three
+  hotel cards, map placeholder)
+- error: shown if the backend request fails for any reason
+
+All UI components (ResultsScreen, AccommodationCard, etc.) depend on
+ONE internal type, JourneyResult. They know nothing about the backend.
+
+
+----------------------------------------------------------------
+2. DATA FLOW: API -> ADAPTER -> UI
+----------------------------------------------------------------
+
+  Backend JSON
+      |
+      v
+  src/api/client.ts        <- the only file that calls fetch()
+      |  (raw wire response, typed as BackendReadingResponse)
+      v
+  src/api/adapter.ts        <- the only file that reshapes backend
+      |                        fields into frontend fields
+      |  (JourneyResult)
+      v
+  src/services/journalService.ts   <- single entry point the UI calls
+      |
+      v
+  UI components (ResultsScreen, AccommodationCard, ...)
+
+Why this matters for you: if your response shape changes, drifts, or
+gains new fields, only api/types.ts and api/adapter.ts need to change
+on the frontend. Nothing else does.
+
+
+----------------------------------------------------------------
+3. EXACT BACKEND RESPONSE FORMAT THE FRONTEND EXPECTS
+----------------------------------------------------------------
+
+Endpoint:  POST /api/reading
+Success:   HTTP 200, Content-Type: application/json
+
+Request bodies the frontend sends:
+
+  Typed journal entry:
+    Content-Type: application/json
+    { "text": "<string>" }
+
+  Uploaded image:
+    Content-Type: multipart/form-data
+    field "image" = the file (png/jpg/jpeg/heic/heif)
+    NOTE: this is an ASSUMPTION, not confirmed — see section 5.
+
+Expected JSON response shape (flat, matches what you currently return):
+
+  {
+    "description": "<string>",
+    "archetype": "<string>",
+    "city": "<string>",
+
+    "hotel1Name":   "<string>",
+    "hotel1Image":  "<string, URL>",
+    "hotel1Price":  "<string>",
+    "hotel1Source": "<string>",
+    "hotel1Rating": <number or null>,
+    "hotel1Url":    "<string, URL>",
+
+    "hotel2Name":   "<string>",
+    "hotel2Image":  "<string, URL>",
+    "hotel2Price":  "<string>",
+    "hotel2Source": "<string>",
+    "hotel2Rating": <number or null>,
+    "hotel2Url":    "<string, URL>",
+
+    "hotel3Name":   "<string>",
+    "hotel3Image":  "<string, URL>",
+    "hotel3Price":  "<string>",
+    "hotel3Source": "<string>",
+    "hotel3Rating": <number or null>,
+    "hotel3Url":    "<string, URL>",
+
+    "message": "<string>"
+  }
+
+Error response: any non-2xx status. FastAPI's default
+{"detail": "..."} shape is fine — see section 8 for how the frontend
+currently handles it.
+
+
+----------------------------------------------------------------
+4. FIELD MAPPING (BACKEND -> FRONTEND)
+----------------------------------------------------------------
+
+  Backend field      Frontend field              Notes
+  -----------------  --------------------------  ------------------------
+  message             reflection                  main reflection text
+  archetype            archetype.name
+  description           archetype.description
+  city                  destination.name           also used as map.placeName
+  (not returned)      destination.country         placeholder "" for now
+  (not returned)      destination.region          placeholder "" for now
+  (not returned)      destination.tagline         placeholder "" for now
+  hotel1Name           listings[0].name
+  hotel1Image          listings[0].image
+  hotel1Price          listings[0].price
+  hotel1Source         listings[0].source
+  hotel1Rating         listings[0].rating         null/invalid -> omitted
+  hotel1Url            listings[0].url
+  hotel2Name..Url      listings[1].*              same pattern, id "hotel-2"
+  hotel3Name..Url      listings[2].*              same pattern, id "hotel-3"
+  (not returned)      map.latitude               placeholder 0 for now
+  (not returned)      map.longitude               placeholder 0 for now
+  city                 map.placeName
+
+listings[].id is generated by the frontend as "hotel-1"/"hotel-2"/
+"hotel-3" — you do not need to send an id.
+
+
+----------------------------------------------------------------
+5. ASSUMPTIONS THE FRONTEND MAKES
+----------------------------------------------------------------
+
+- Exactly 3 hotels, always in hotel1/hotel2/hotel3 slots. There is no
+  support today for fewer or more than 3.
+- hotel*Rating may be a number or null. Anything else (missing key,
+  NaN, a non-numeric string) is treated as "no rating" — the star line
+  is simply not shown for that card. It will not crash the app.
+- hotel*Image and hotel*Url are expected to be valid, directly usable
+  URLs (an <img src> and an <a href> respectively). No validation or
+  fallback image is applied if they are broken or empty.
+- All string fields are expected to be non-empty for a good result,
+  but empty strings will not crash anything — they will just render
+  as blank text.
+- The single POST /api/reading endpoint handles both text and image
+  input, distinguished only by Content-Type. This is NOT confirmed
+  against real backend code — flag if you want two separate routes.
+- The image upload field is named "image" in the multipart body. Also
+  not yet confirmed — the backend doesn't accept images yet.
+- One request, one JSON response. No polling, no job queue, no
+  streaming/SSE. If generating a reading is slow (vision LLM + Stay22
+  lookup), the frontend will simply wait on a single fetch() — there
+  is no progress reporting beyond the fixed loading animation.
+- No auth headers are sent with the request today.
+
+
+----------------------------------------------------------------
+6. SWITCHING FROM MOCK MODE TO THE REAL API
+----------------------------------------------------------------
+
+The frontend defaults to mock data so it works with no backend
+running. To point it at your live backend:
+
+  1. In client/, copy .env.example to .env.local
+  2. Set:
+       VITE_USE_MOCK_DATA=false
+  3. (Optional) Set VITE_API_BASE_URL if the backend isn't reachable
+     via the Vite dev proxy (client/vite.config.ts forwards /api to
+     http://localhost:8000 by default — update that port if yours
+     differs).
+  4. Restart the dev server (npm run dev).
+
+No code changes are required to switch — this is purely an env var.
+
+
+----------------------------------------------------------------
+7. INTEGRATION CHECKLIST (FOR THE BACKEND TEAMMATE)
+----------------------------------------------------------------
+
+  [ ] POST /api/reading accepts { "text": "<string>" } as JSON
+  [ ] Response is HTTP 200 with Content-Type: application/json
+  [ ] Response includes all fields listed in section 3, spelled
+      exactly as shown (case-sensitive: hotel1Name, not Hotel1Name)
+  [ ] message, archetype, description, city are non-empty strings
+  [ ] All 3 hotel groups are present, even if a rating is null
+  [ ] hotel*Image and hotel*Url are real, working URLs (open them in
+      a browser to confirm)
+  [ ] hotel*Rating is a JSON number (e.g. 4.7) or JSON null — not a
+      string like "4.7" or "N/A"
+  [ ] CORS allows the frontend's origin (currently proxied through
+      Vite in dev, so this mainly matters for a deployed frontend)
+  [ ] Error responses use a non-2xx status code
+  [ ] Set VITE_USE_MOCK_DATA=false locally and click through the full
+      journal -> reading -> results flow with a real request
+  [ ] Try an empty/short journal entry and confirm the backend
+      doesn't 500
+
+
+----------------------------------------------------------------
+8. COMMON INTEGRATION ISSUES
+----------------------------------------------------------------
+
+- Missing field: if any field from section 3 is absent from the JSON,
+  it will render as "undefined" in the UI (for strings) rather than
+  throwing an error. It will not crash, but it will look broken.
+  Double-check spelling and casing against section 3.
+
+- Rating as a string: "hotel1Rating": "4.7" is tolerated (the frontend
+  parses numeric strings), but prefer sending a real JSON number.
+  "N/A", "", or missing keys are all treated as "no rating."
+
+- Broken image/url: if hotel*Image or hotel*Url is empty or invalid,
+  the card will show a broken image icon / a dead link. There is no
+  server-side or client-side fallback today.
+
+- Wrong Content-Type: the frontend sets Content-Type: application/json
+  for text submissions. If your endpoint expects a different content
+  type or a different body shape, requests will fail with a 4xx and
+  the frontend will show a generic error screen (it does not parse
+  the error body's message today — see section 5).
+
+- CORS during local dev: if you run the backend on a port other than
+  8000, either update client/vite.config.ts's proxy target or set
+  VITE_API_BASE_URL, otherwise requests will fail before reaching
+  your server.
+
+- Slow responses: there is no timeout configured on the frontend
+  fetch call today. A very slow backend will just make the loading
+  screen run longer — it will not time out and show an error.
+
+- Image uploads: not yet implemented on the backend. The frontend
+  will send a multipart/form-data request with a field named "image"
+  once a user uploads a photo — this is unconfirmed and may need
+  adjustment once that endpoint exists.
+
+
+----------------------------------------------------------------
+Questions? The frontend's API layer lives entirely in client/src/api/
+(config.ts, types.ts, client.ts, adapter.ts) — that's the complete
+surface area you need to know about to change or debug integration.
+================================================================
