@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from archetypes import ARCHETYPES
 from models import Interpretation
 from fastapi.middleware.cors import CORSMiddleware
+from tenacity import retry, stop_after_attempt, retry_if_exception_type
 
 load_dotenv()
 
@@ -43,7 +44,10 @@ Return the archetype that best matches the writing, and a city that is most rele
 }}
 """
 
-
+@retry(
+    stop=stop_after_attempt(3),
+    retry=retry_if_exception_type(ValueError),
+)
 async def get_interpretation(text: str, archetype_list: list[str]) -> Interpretation:
     response = client.models.generate_content(
         model="gemini-3.5-flash",
