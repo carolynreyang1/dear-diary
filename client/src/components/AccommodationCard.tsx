@@ -26,6 +26,14 @@ export function AccommodationCard({ listing, index }: AccommodationCardProps) {
       <div className="accommodation-card__body">
         <span className="accommodation-card__source">{listing.source}</span>
         <h3 className="accommodation-card__name">{listing.name}</h3>
+        {listing.rating !== undefined && (
+          <p className="accommodation-card__rating">
+            <span className="accommodation-card__star" aria-hidden="true">
+              ★
+            </span>{' '}
+            {listing.rating.toFixed(1)} • {listing.source}
+          </p>
+        )}
         <p className="accommodation-card__price">{listing.price}</p>
         <a
           className="accommodation-card__cta"

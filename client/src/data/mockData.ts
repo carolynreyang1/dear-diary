@@ -74,6 +74,7 @@ export const MOCK_JOURNEY_RESULT: JourneyResult = {
       price: 'From $420 / night',
       source: 'Demo · Booking.com',
       url: 'https://example.com/stays/hoshinoya-kyoto',
+      rating: 4.9,
     },
     {
       id: 'sowaka',
@@ -82,6 +83,7 @@ export const MOCK_JOURNEY_RESULT: JourneyResult = {
       price: 'From $280 / night',
       source: 'Demo · Airbnb',
       url: 'https://example.com/stays/sowaka',
+      rating: 4.8,
     },
     {
       id: 'aoyama',
@@ -90,6 +92,7 @@ export const MOCK_JOURNEY_RESULT: JourneyResult = {
       price: 'From $145 / night',
       source: 'Demo · Hotels.com',
       url: 'https://example.com/stays/aoyama-tea-house',
+      rating: 4.7,
     },
   ],
   map: {
