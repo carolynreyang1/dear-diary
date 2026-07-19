@@ -69,6 +69,18 @@
   margin: 0 0 0.4rem;
 }
 
+.accommodation-card__rating {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+  margin: 0 0 0.5rem;
+}
+
+.accommodation-card__star {
+  color: #c1983f;
+}
+
 .accommodation-card__price {
   font-family: var(--font-sans);
   font-size: 0.72rem;

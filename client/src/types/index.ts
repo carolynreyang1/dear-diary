@@ -30,6 +30,7 @@ export interface Listing {
   price: string
   source: string
   url: string
+  rating?: number
 }
 
 export interface JourneyResult {
