@@ -1,0 +1,24 @@
+.editorial-label {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: var(--space-sm);
+}
+
+.editorial-label::after {
+  content: '';
+  display: block;
+  width: 1.5rem;
+  height: 1px;
+  background: var(--border);
+  margin-top: 0.5rem;
+}
+
+.results__hero .editorial-label::after {
+  margin-left: auto;
+  margin-right: auto;
+}
