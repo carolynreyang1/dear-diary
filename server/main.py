@@ -24,6 +24,7 @@ async def parse_listings(raw_response: dict) -> list[stay22Listing]:
         suppliers = item.get("suppliers", {})
         supplier_name, supplier_data = next(iter(suppliers.items()), (None, {}))
         price = supplier_data.get("price", {}).get("total")
+        coordinates = item.get("location", {}).get("coordinates", {})
 
         listings.append(stay22Listing(
             name=item.get("name"),
@@ -32,6 +33,8 @@ async def parse_listings(raw_response: dict) -> list[stay22Listing]:
             source=supplier_name,
             rating=item.get("rating", {}).get("hotelStars"),
             url=item.get("url"),
+            lat=coordinates.get("lat"),
+            lng=coordinates.get("lng"),
         ))
     return listings
 
@@ -69,8 +72,11 @@ async def get_diarytext(request: Request):
 
     def hotel_fields(hotel, n):
         if hotel is None:
-            return {f"hotel{n}Name": None, f"hotel{n}Image": None, f"hotel{n}Price": None,
-                     f"hotel{n}Source": None, f"hotel{n}Rating": None, f"hotel{n}Url": None}
+            return {
+                f"hotel{n}Name": None, f"hotel{n}Image": None, f"hotel{n}Price": None,
+                f"hotel{n}Source": None, f"hotel{n}Rating": None, f"hotel{n}Url": None,
+                f"hotel{n}Lat": None, f"hotel{n}Lng": None,
+            }
         return {
             f"hotel{n}Name": hotel.name,
             f"hotel{n}Image": hotel.thumbnail,
@@ -78,6 +84,8 @@ async def get_diarytext(request: Request):
             f"hotel{n}Source": hotel.source,
             f"hotel{n}Rating": hotel.rating,
             f"hotel{n}Url": hotel.url,
+            f"hotel{n}Lat": hotel.lat,
+            f"hotel{n}Lng": hotel.lng,
         }
 
     return {

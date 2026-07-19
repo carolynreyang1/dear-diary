@@ -17,6 +17,8 @@ class stay22Listing(BaseModel):
     source: str | None = None
     rating: int | None = None
     url: str | None = None
+    lat: float | None
+    lng: float | None
 
 #Stay22 API response model
 class stay22Response(BaseModel):
