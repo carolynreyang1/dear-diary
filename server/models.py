@@ -7,7 +7,7 @@ app = FastAPI()
 
 #Input user data model
 class inputUserData(BaseModel):
-    diaryEntry: str
+    text: str
 
 #output model
 class stay22Listing(BaseModel):
