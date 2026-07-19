@@ -10,6 +10,10 @@
  * `ratingN` is typed as `number | null` since the backend may not always
  * have a rating for a hotel — adapter.ts treats null/invalid values as
  * "no rating" rather than crashing.
+ *
+ * The hotel2 and hotel3 groups are optional/nullable because the backend
+ * may return fewer than 3 hotels — adapter.ts drops any hotel group
+ * without a valid name instead of rendering a placeholder card.
  */
 export interface BackendReadingResponse {
   description: string
@@ -23,19 +27,19 @@ export interface BackendReadingResponse {
   hotel1Rating: number | null
   hotel1Url: string
 
-  hotel2Name: string
-  hotel2Image: string
-  hotel2Price: string
-  hotel2Source: string
-  hotel2Rating: number | null
-  hotel2Url: string
+  hotel2Name?: string | null
+  hotel2Image?: string | null
+  hotel2Price?: string | null
+  hotel2Source?: string | null
+  hotel2Rating?: number | null
+  hotel2Url?: string | null
 
-  hotel3Name: string
-  hotel3Image: string
-  hotel3Price: string
-  hotel3Source: string
-  hotel3Rating: number | null
-  hotel3Url: string
+  hotel3Name?: string | null
+  hotel3Image?: string | null
+  hotel3Price?: string | null
+  hotel3Source?: string | null
+  hotel3Rating?: number | null
+  hotel3Url?: string | null
 
   message: string
 }

@@ -53,7 +53,7 @@ export function adaptReadingResponse(
         raw.hotel3Rating,
         raw.hotel3Url,
       ),
-    ],
+    ].filter((listing): listing is Listing => listing !== null),
     map: {
       latitude: 0, // placeholder — backend doesn't return coordinates yet
       longitude: 0, // placeholder — backend doesn't return coordinates yet
@@ -62,16 +62,29 @@ export function adaptReadingResponse(
   }
 }
 
+/** Returns null (dropped from listings) when the hotel has no valid name — covers hotel2/hotel3 being absent, null, or empty. */
 function toListing(
   id: string,
-  name: string,
-  image: string,
-  price: string,
-  source: string,
+  name: string | null | undefined,
+  image: string | null | undefined,
+  price: string | null | undefined,
+  source: string | null | undefined,
   rating: unknown,
-  url: string,
-): Listing {
-  return { id, name, image, price, source, url, rating: parseRating(rating) }
+  url: string | null | undefined,
+): Listing | null {
+  if (!name || name.trim() === '') {
+    return null
+  }
+
+  return {
+    id,
+    name,
+    image: image ?? '',
+    price: price ?? '',
+    source: source ?? '',
+    url: url ?? '',
+    rating: parseRating(rating),
+  }
 }
 
 /** Accepts a finite number or a numeric string; anything else (missing, null, NaN, garbage) becomes "no rating" instead of crashing. */
